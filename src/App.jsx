@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useMemo, useRef } from 'react';
 import FactoryScene from './components/FactoryScene';
 import TopBar from './components/TopBar';
@@ -5,6 +6,7 @@ import SceneHierarchy from './components/SceneHierarchy';
 import MachineInspector from './components/MachineInspector';
 import OperationalStrip from './components/OperationalStrip';
 import AnalysisModal from './components/AnalysisModal';
+import Homepage from './components/Homepage';
 import AuthScreen from './components/AuthScreen';
 import ChatPlanner from './components/ChatPlanner';
 import { MACHINE_CONFIGS } from './data/machines';
@@ -23,12 +25,12 @@ const initialBackupStates = Object.fromEntries(
   MACHINE_CONFIGS.map((m) => [m.id, !!m.defaultBackupEnabled])
 );
 
-// Safe session-scoped storage helpers for non-sensitive demo session state
+// Safe session-scoped storage helpers for demo session state
 function getSessionItem(key, fallback = null) {
   try {
     const raw = sessionStorage.getItem(key);
     return raw ? JSON.parse(raw) : fallback;
-  } catch (err) {
+  } catch {
     return fallback;
   }
 }
@@ -40,8 +42,8 @@ function setSessionItem(key, value) {
     } else {
       sessionStorage.setItem(key, JSON.stringify(value));
     }
-  } catch (err) {
-    // Graceful fallback if storage disabled or unavailable
+  } catch {
+    // Graceful fallback if storage is unavailable
   }
 }
 
@@ -53,36 +55,38 @@ const DEFAULT_DEMO_USER = {
 };
 
 export default function App() {
-  // Demo Workspace Navigation & Identity Flow: 'auth' → 'chat' → 'factory'
-  const [currentUser, setCurrentUser] = useState(() => {
-    return getSessionItem('keystone_demo_user', DEFAULT_DEMO_USER);
-  });
+  // Navigation: home → auth → chat → factory
+  const [currentUser, setCurrentUser] = useState(() =>
+    getSessionItem('keystone_demo_user', DEFAULT_DEMO_USER)
+  );
 
   const [currentView, setCurrentView] = useState(() => {
     const saved = getSessionItem('keystone_demo_view');
-    return saved && ['chat', 'factory'].includes(saved) ? saved : 'auth';
+    return saved && ['chat', 'factory', 'auth'].includes(saved)
+      ? saved
+      : 'home';
   });
 
-  const [planContext, setPlanContext] = useState(() => {
-    return getSessionItem('keystone_demo_plan', null);
-  });
+  const [planContext, setPlanContext] = useState(() =>
+    getSessionItem('keystone_demo_plan', null)
+  );
 
-  const [hasOpenedFactory, setHasOpenedFactory] = useState(() => {
-    const saved = getSessionItem('keystone_demo_view');
-    return saved === 'factory';
-  });
+  const [hasOpenedFactory, setHasOpenedFactory] = useState(() =>
+    getSessionItem('keystone_demo_view') === 'factory'
+  );
 
   const [machineStates, setMachineStates] = useState(initialMachineStates);
   const [backupStates, setBackupStates] = useState(initialBackupStates);
   const [selectedStationId, setSelectedStationId] = useState('cutting');
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
+
   const [eventLog, setEventLog] = useState([
     'SYSTEM INITIALIZED — 4/4 STATIONS ONLINE',
   ]);
 
   const sceneRef = useRef(null);
 
-  // Analysis Hook talking to FastAPI backend
+  // Analysis hook connected to the FastAPI backend
   const {
     report,
     recommendations,
@@ -90,7 +94,6 @@ export default function App() {
     recLoading,
     error: analyzeError,
     analyze,
-    clear: clearAnalysis,
   } = useAnalysis();
 
   const appendLog = useCallback((message) => {
@@ -98,53 +101,65 @@ export default function App() {
   }, []);
 
   // Toggle station operational / failed
-  const toggleMachine = useCallback((id) => {
-    setMachineStates((prev) => {
-      const willBeFailed = !prev[id];
-      const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
-      const name = stationObj ? stationObj.name : id;
+  const toggleMachine = useCallback(
+    (id) => {
+      setMachineStates((prev) => {
+        const willBeFailed = !prev[id];
+        const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
+        const name = stationObj ? stationObj.name : id;
 
-      appendLog(
-        willBeFailed
-          ? `[FAULT INJECTED] Station '${name}' simulated breakdown.`
-          : `[RESTORED] Station '${name}' returned to normal operation.`
-      );
+        appendLog(
+          willBeFailed
+            ? `[FAULT INJECTED] Station '${name}' simulated breakdown.`
+            : `[RESTORED] Station '${name}' returned to normal operation.`
+        );
 
-      return { ...prev, [id]: willBeFailed };
-    });
-  }, [appendLog]);
+        return { ...prev, [id]: willBeFailed };
+      });
+    },
+    [appendLog]
+  );
 
   // Toggle station standby backup configuration
-  const toggleBackup = useCallback((id) => {
-    setBackupStates((prev) => {
-      const willBeEnabled = !prev[id];
-      const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
-      const name = stationObj ? stationObj.name : id;
+  const toggleBackup = useCallback(
+    (id) => {
+      setBackupStates((prev) => {
+        const willBeEnabled = !prev[id];
+        const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
+        const name = stationObj ? stationObj.name : id;
 
-      appendLog(
-        willBeEnabled
-          ? `[STANDBY READY] Backup redundancy armed for '${name}'.`
-          : `[STANDBY OFF] Backup redundancy disarmed for '${name}'.`
-      );
+        appendLog(
+          willBeEnabled
+            ? `[STANDBY READY] Backup redundancy armed for '${name}'.`
+            : `[STANDBY OFF] Backup redundancy disarmed for '${name}'.`
+        );
 
-      return { ...prev, [id]: willBeEnabled };
-    });
-  }, [appendLog]);
+        return { ...prev, [id]: willBeEnabled };
+      });
+    },
+    [appendLog]
+  );
 
   // Restore all machines to operational state
   const resetAll = useCallback(() => {
     setMachineStates(initialMachineStates);
-    appendLog('[ALL CLEAR] Reset command executed — all stations restored.');
+    appendLog(
+      '[ALL CLEAR] Reset command executed — all stations restored.'
+    );
   }, [appendLog]);
 
   // Select station across hierarchy, 3D viewport, and inspector
-  const handleSelectStation = useCallback((id) => {
-    setSelectedStationId(id);
-    const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
-    if (stationObj) {
-      appendLog(`[INSPECT] Selected station '${stationObj.name}'.`);
-    }
-  }, [appendLog]);
+  const handleSelectStation = useCallback(
+    (id) => {
+      setSelectedStationId(id);
+      const stationObj = MACHINE_CONFIGS.find((m) => m.id === id);
+
+      if (stationObj) {
+        appendLog(`[INSPECT] Selected station '${stationObj.name}'.`);
+      }
+    },
+    [appendLog]
+  );
 
   // Derived simulation snapshot
   const sim = useMemo(
@@ -152,23 +167,36 @@ export default function App() {
     [machineStates, backupStates]
   );
 
-  // Run failure analysis via API and open modal
+  // Run failure analysis and open the modal
   const handleOpenAnalysis = useCallback(() => {
     setIsAnalysisModalOpen(true);
     appendLog('[ANALYSIS] Querying FailureEngine & MitigationEngine…');
     analyze(MACHINE_CONFIGS, backupStates);
   }, [analyze, backupStates, appendLog]);
 
-  // Quick action from recommendation card to enable backup
-  const handleApplyMitigation = useCallback((stationId) => {
-    setBackupStates((prev) => ({ ...prev, [stationId]: true }));
-    appendLog(`[MITIGATION APPLIED] Standby enabled on station '${stationId}'.`);
-    // Re-run analysis with updated backup states
-    analyze(MACHINE_CONFIGS, { ...backupStates, [stationId]: true });
-  }, [backupStates, analyze, appendLog]);
+  // Apply a recommended mitigation by enabling standby backup
+  const handleApplyMitigation = useCallback(
+    (stationId) => {
+      const updatedBackupStates = {
+        ...backupStates,
+        [stationId]: true,
+      };
+
+      setBackupStates(updatedBackupStates);
+
+      appendLog(
+        `[MITIGATION APPLIED] Standby enabled on station '${stationId}'.`
+      );
+
+      analyze(MACHINE_CONFIGS, updatedBackupStates);
+    },
+    [backupStates, analyze, appendLog]
+  );
 
   const selectedStation = useMemo(
-    () => MACHINE_CONFIGS.find((m) => m.id === selectedStationId) || MACHINE_CONFIGS[0],
+    () =>
+      MACHINE_CONFIGS.find((m) => m.id === selectedStationId) ||
+      MACHINE_CONFIGS[0],
     [selectedStationId]
   );
 
@@ -182,41 +210,77 @@ export default function App() {
     return selectedId ? getMachineById(selectedId) : null;
   }, [planContext, selectedStation.id]);
 
-  const handleAuthenticate = useCallback((authData) => {
-    const user = authData.user || DEFAULT_DEMO_USER;
-    setCurrentUser(user);
-    setSessionItem('keystone_demo_user', user);
-    setCurrentView('chat');
-    setSessionItem('keystone_demo_view', 'chat');
-    appendLog(`[DEMO WORKSPACE OPENED] Welcome ${user.name}`);
-  }, [appendLog]);
+  // Complete authentication/demo entry flow
+  const handleAuthenticate = useCallback(
+    (authData) => {
+      const user = authData?.user || DEFAULT_DEMO_USER;
 
-  const handleSimulateFactory = useCallback((plan) => {
-    setPlanContext(plan);
-    setSessionItem('keystone_demo_plan', plan);
-    setHasOpenedFactory(true);
-    setCurrentView('factory');
-    setSessionItem('keystone_demo_view', 'factory');
+      setCurrentUser(user);
+      setSessionItem('keystone_demo_user', user);
 
-    // If user's plan specifies redundancy, ensure standby is armed on cutting and welding
-    if (plan?.redundancyPreference?.toLowerCase().includes('standby')) {
-      setBackupStates((prev) => ({
-        ...prev,
-        cutting: true,
-        welding: true,
-      }));
-    }
+      setCurrentView('chat');
+      setSessionItem('keystone_demo_view', 'chat');
 
-    appendLog(`[FACTORY LOADED] 3D Simulation initialized for plan: ${plan.productType}`);
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 50);
-  }, [appendLog]);
+      appendLog(`[WORKSPACE OPENED] Welcome ${user.name}`);
+    },
+    [appendLog]
+  );
+
+  const handleGetStarted = useCallback(() => {
+    setCurrentView('auth');
+    setSessionItem('keystone_demo_view', 'auth');
+  }, []);
+
+  const handleSignIn = useCallback(() => {
+    setCurrentView('auth');
+    setSessionItem('keystone_demo_view', 'auth');
+  }, []);
+
+  const handleContinueAsGuest = useCallback(() => {
+    handleAuthenticate({ user: DEFAULT_DEMO_USER });
+  }, [handleAuthenticate]);
+
+  const handleBackToHome = useCallback(() => {
+    setCurrentView('home');
+    setSessionItem('keystone_demo_view', 'home');
+  }, []);
+
+  // Load the factory using the planner's submitted configuration
+  const handleSimulateFactory = useCallback(
+    (plan) => {
+      setPlanContext(plan);
+      setSessionItem('keystone_demo_plan', plan);
+
+      setHasOpenedFactory(true);
+      setCurrentView('factory');
+      setSessionItem('keystone_demo_view', 'factory');
+
+      // Enable cutting and welding standby if requested
+      if (plan?.redundancyPreference?.toLowerCase().includes('standby')) {
+        setBackupStates((prev) => ({
+          ...prev,
+          cutting: true,
+          welding: true,
+        }));
+      }
+
+      appendLog(
+        `[FACTORY LOADED] 3D Simulation initialized for plan: ${plan?.productType || 'Custom production'
+        }`
+      );
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+    },
+    [appendLog]
+  );
 
   const handleQuickJumpToFactory = useCallback(() => {
     setHasOpenedFactory(true);
     setCurrentView('factory');
     setSessionItem('keystone_demo_view', 'factory');
+
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 50);
@@ -234,15 +298,24 @@ export default function App() {
 
   return (
     <>
-      {/* ── View 1: Demo Identity & Workspace Entry ─────────────── */}
-      {currentView === 'auth' && (
-        <AuthScreen
-          initialName={currentUser?.name || DEFAULT_DEMO_USER.name}
-          onAuthenticate={handleAuthenticate}
+      {/* View 0: Keystone homepage */}
+      {currentView === 'home' && (
+        <Homepage
+          onGetStarted={handleGetStarted}
+          onSignIn={handleSignIn}
+          onContinueAsGuest={handleContinueAsGuest}
         />
       )}
 
-      {/* ── View 2: Conversational Factory Planner ─────────────────── */}
+      {/* View 1: Authentication screen */}
+      {currentView === 'auth' && (
+        <AuthScreen
+          onAuthenticate={handleAuthenticate}
+          onBackToHome={handleBackToHome}
+        />
+      )}
+
+      {/* View 2: Conversational factory planner */}
       {currentView === 'chat' && (
         <ChatPlanner
           user={currentUser}
@@ -250,16 +323,18 @@ export default function App() {
           onSimulateFactory={handleSimulateFactory}
           onQuickJumpToFactory={handleQuickJumpToFactory}
           onSwitchProfile={handleSwitchProfile}
+          onBackToHome={handleBackToHome}
         />
       )}
 
-      {/* ── View 3: 3D Factory Simulation Workbench ───────────────── */}
+      {/* View 3: 3D factory simulation workbench */}
       {hasOpenedFactory && (
         <div
           className="workbench-shell"
-          style={{ display: currentView === 'factory' ? 'grid' : 'none' }}
+          style={{
+            display: currentView === 'factory' ? 'grid' : 'none',
+          }}
         >
-          {/* ── Top Application Command Bar ────────────────────────────── */}
           <TopBar
             sim={sim}
             onResetSimulation={resetAll}
@@ -273,7 +348,6 @@ export default function App() {
             user={currentUser}
           />
 
-          {/* ── Left Scene Outliner / Hierarchy ───────────────────────── */}
           <SceneHierarchy
             machines={MACHINE_CONFIGS}
             machineStates={machineStates}
@@ -283,9 +357,7 @@ export default function App() {
             onToggleFailure={toggleMachine}
           />
 
-          {/* ── Central 3D Factory Viewport ────────────────────────────── */}
           <main className="wb-viewport-container">
-            {/* Viewport Overlay Controls */}
             <div className="wb-viewport-overlay-top">
               <div className="wb-viewport-tag">
                 <span style={{ color: 'var(--accent-orange)' }}>●</span>
@@ -302,6 +374,7 @@ export default function App() {
                 >
                   Front
                 </button>
+
                 <button
                   className="wb-btn"
                   onClick={() => sceneRef.current?.setIsometricView()}
@@ -309,6 +382,7 @@ export default function App() {
                 >
                   Iso
                 </button>
+
                 <button
                   className="wb-btn"
                   onClick={() => sceneRef.current?.resetCamera()}
@@ -319,7 +393,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* 3D Scene */}
             <FactoryScene
               ref={sceneRef}
               machineStates={machineStates}
@@ -329,13 +402,12 @@ export default function App() {
               onMachineClick={handleSelectStation}
             />
 
-            {/* Navigation Hint */}
             <div className="wb-viewport-hint">
-              Left Drag: Orbit · Scroll: Zoom · Right Drag / Shift+Drag: Pan · Click Station: Select & Inspect
+              Left Drag: Orbit · Scroll: Zoom · Right Drag / Shift+Drag: Pan ·
+              Click Station: Select & Inspect
             </div>
           </main>
 
-          {/* ── Right Station Properties Inspector ─────────────────────── */}
           <MachineInspector
             station={selectedStation}
             stationStat={selectedStationStat}
@@ -350,7 +422,6 @@ export default function App() {
             planCatalogueMachine={selectedCatalogueMachine}
           />
 
-          {/* ── Bottom Operational Telemetry & Sequence Strip ──────────── */}
           <OperationalStrip
             machines={MACHINE_CONFIGS}
             machineStates={machineStates}
@@ -361,7 +432,6 @@ export default function App() {
             eventLog={eventLog}
           />
 
-          {/* ── Failure Analysis & Mitigations Modal Workspace ──────────── */}
           {isAnalysisModalOpen && (
             <AnalysisModal
               report={report}

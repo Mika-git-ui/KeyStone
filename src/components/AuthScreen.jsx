@@ -1,37 +1,50 @@
 import { useState } from 'react';
 import './AuthScreen.css';
 
-const DEFAULT_DISPLAY_NAME = 'Demo Engineer';
+export default function AuthScreen({ onAuthenticate, onBackToHome }) {
+  const [mode, setMode] = useState('signin'); // 'signin' | 'signup'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [authNotice, setAuthNotice] = useState(null);
 
-const ROLE_PRESETS = [
-  'Demo Engineer',
-  'Lead Process Planner',
-  'Plant Operations Specialist',
-  'Hackathon Evaluator',
-];
+  const validate = () => {
+    const errs = {};
+    if (!email.trim()) {
+      errs.email = 'Please enter your corporate email';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errs.email = 'Please enter a valid email address';
+    }
 
-export default function AuthScreen({ onAuthenticate, initialName = DEFAULT_DISPLAY_NAME }) {
-  const [displayName, setDisplayName] = useState(initialName || DEFAULT_DISPLAY_NAME);
+    if (!password) {
+      errs.password = 'Please enter your password';
+    } else if (password.length < 6) {
+      errs.password = 'Password must be at least 6 characters';
+    }
 
-  const effectiveName = displayName.trim() || DEFAULT_DISPLAY_NAME;
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
-  // Generate 2-letter avatar initials from the display name
-  const initials = effectiveName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('') || 'DE';
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-  const handleEnterWorkspace = () => {
+    // Honest communication: External cloud auth provider (Supabase / Firebase) is not configured in this demo build
+    setAuthNotice(
+      'Cloud authentication is pending configuration for this evaluation build. Please use the "Continue as guest" option below to immediately test the full factory planner.'
+    );
+  };
+
+  const handleGuestEntry = () => {
     onAuthenticate({
-      isDemo: true,
+      isGuest: true,
       user: {
-        id: `demo_${Date.now()}`,
-        name: effectiveName,
+        id: `guest_${Date.now()}`,
+        name: 'Demo Engineer',
         role: 'Virtual Factory Planner',
-        facility: 'Pilot Plant Alpha (Demo Corridor)',
-        isTemporary: true,
+        facility: 'Pilot Plant Alpha',
       },
     });
   };
@@ -39,123 +52,130 @@ export default function AuthScreen({ onAuthenticate, initialName = DEFAULT_DISPL
   return (
     <div className="auth-viewport-wrapper">
       <div className="auth-card">
-        {/* Top CAD/CAM Industrial Titlebar */}
+        {/* Top Navbar Cluster */}
         <div className="auth-card-topbar">
+          <button type="button" className="auth-back-link" onClick={onBackToHome}>
+            <span>←</span>
+            <span>Back to Keystone</span>
+          </button>
+
           <div className="auth-brand">
             <div className="auth-logo-mark">K</div>
-            <div className="auth-title">KEYSTONE</div>
+            <span className="auth-title">KEYSTONE</span>
           </div>
-          <div className="auth-build-tag">DEMO WORKSPACE · HACKATHON BUILD</div>
         </div>
 
         {/* Card Body */}
         <div className="auth-card-body">
-          {/* Welcome & System Description */}
           <div className="auth-welcome-block">
-            <h1 className="auth-headline">Virtual Factory Planning & Simulation</h1>
+            <h2 className="auth-headline">
+              {mode === 'signin' ? 'Sign in to Keystone' : 'Create your account'}
+            </h2>
             <p className="auth-subhead">
-              Autonomous line configuration, deterministic bottleneck analysis, and real-time 3D digital twin verification across 4 sequential machine stations (Cutting → Welding → Assembly → Inspection).
+              {mode === 'signin'
+                ? 'Access your factory planning sessions and 3D digital twins.'
+                : 'Start designing and simulating production lines in minutes.'}
             </p>
           </div>
 
-          {/* Demo Identity & Workspace Profile Card */}
-          <div className="demo-identity-box">
-            <div className="demo-status-pill">
-              <span>●</span>
-              <span>TEMPORARY DEMO SESSION · NO ACCOUNT REQUIRED</span>
-            </div>
+          {/* Mode Switcher Tabs */}
+          <div className="auth-mode-tabs" role="tablist">
+            <button
+              type="button"
+              className={`auth-tab-btn ${mode === 'signin' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('signin');
+                setErrors({});
+                setAuthNotice(null);
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`auth-tab-btn ${mode === 'signup' ? 'active' : ''}`}
+              onClick={() => {
+                setMode('signup');
+                setErrors({});
+                setAuthNotice(null);
+              }}
+            >
+              Create Account
+            </button>
+          </div>
 
-            <div className="demo-profile-header">
-              <div className="demo-avatar" aria-label={`Avatar for ${effectiveName}`}>
-                {initials}
-              </div>
-              <div className="demo-profile-meta">
-                <span className="demo-profile-name-display">{effectiveName}</span>
-                <span className="demo-profile-role-display">
-                  Virtual Line Planner · Pilot Plant Alpha
-                </span>
-              </div>
-            </div>
-
-            {/* Display Name Customization Field */}
-            <div className="demo-name-field">
-              <label className="demo-field-label" htmlFor="demo-name-input">
-                <span>Engineer Display Name</span>
-                <span className="demo-field-helper">Optional: customize for this demo</span>
+          {/* Email / Password Form */}
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            <div className="auth-field">
+              <label className="auth-label" htmlFor="auth-email-input">
+                <span>Corporate Email</span>
+                {errors.email && <span className="auth-field-error">{errors.email}</span>}
               </label>
-
-              <div className="demo-input-wrapper">
+              <div className="auth-input-wrapper">
                 <input
-                  id="demo-name-input"
-                  className="demo-name-input"
-                  type="text"
-                  maxLength={40}
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Enter custom display name…"
-                  autoComplete="off"
+                  id="auth-email-input"
+                  className={`auth-input ${errors.email ? 'has-error' : ''}`}
+                  type="email"
+                  placeholder="engineer@plant.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
+                  }}
+                  autoComplete="email"
                 />
               </div>
+            </div>
 
-              {/* Role Preset Quick-Picks */}
-              <div className="demo-preset-group" role="group" aria-label="Quick preset titles">
-                {ROLE_PRESETS.map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    className={`demo-preset-btn ${effectiveName === preset ? 'active' : ''}`}
-                    onClick={() => setDisplayName(preset)}
-                  >
-                    {preset}
-                  </button>
-                ))}
+            <div className="auth-field">
+              <label className="auth-label" htmlFor="auth-password-input">
+                <span>Password</span>
+                {errors.password && <span className="auth-field-error">{errors.password}</span>}
+              </label>
+              <div className="auth-input-wrapper">
+                <input
+                  id="auth-password-input"
+                  className={`auth-input ${errors.password ? 'has-error' : ''}`}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: null }));
+                  }}
+                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                />
+                <button
+                  type="button"
+                  className="auth-eye-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* High-Impact Primary Entry Button */}
-          <button
-            type="button"
-            className="enter-workspace-btn"
-            onClick={handleEnterWorkspace}
-            title="Open conversational factory planner directly"
-          >
-            <span>▶ ENTER MY WORKSPACE</span>
-            <span className="enter-workspace-subtext">
-              Launch Chat-First Factory Planner as {effectiveName}
+            {authNotice && (
+              <div className="auth-feedback-alert">
+                {authNotice}
+              </div>
+            )}
+
+            <button type="submit" className="auth-submit-btn">
+              {mode === 'signin' ? 'Sign In' : 'Create Account'}
+            </button>
+          </form>
+
+          {/* Subtle Guest Option for Demo */}
+          <div className="auth-guest-section">
+            <button type="button" className="auth-guest-btn" onClick={handleGuestEntry}>
+              Continue as guest →
+            </button>
+            <span className="auth-guest-note">
+              Instant evaluation session for hackathon demo · No registration required
             </span>
-          </button>
-
-          {/* Feature Highlights Grid */}
-          <div className="demo-feature-strip">
-            <div className="demo-feature-item">
-              <span className="demo-feature-icon">💬</span>
-              <span>Conversational Line Planner</span>
-            </div>
-            <div className="demo-feature-item">
-              <span className="demo-feature-icon">⚙</span>
-              <span>INR Equipment Catalogue</span>
-            </div>
-            <div className="demo-feature-item">
-              <span className="demo-feature-icon">🧊</span>
-              <span>Interactive 3D Factory Twin</span>
-            </div>
-            <div className="demo-feature-item">
-              <span className="demo-feature-icon">🛡</span>
-              <span>Failure & Standby Engine</span>
-            </div>
           </div>
-
-          {/* Honest Transparency Notice */}
-          <div className="demo-notice-box">
-            ℹ EVALUATION ENVIRONMENT: You are entering an interactive demonstration workspace. All factory configuration, failure scenario permutation, and 3D simulation run client-side and via the connected FastAPI engine. No real account registration or credentials are required.
-          </div>
-        </div>
-
-        {/* CAD/CAM Engineering Footer */}
-        <div className="auth-footer">
-          <span>KEYSTONE WORKSPACE v4.1</span>
-          <span>4-STATION DETERMINISTIC DIGITAL TWIN</span>
         </div>
       </div>
     </div>
