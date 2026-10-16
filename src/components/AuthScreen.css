@@ -1,0 +1,344 @@
+/* ═══════════════════════════════════════════════════════════════════
+   KEYSTONE INDUSTRIAL DEMO WORKSPACE & IDENTITY PORTAL
+   Design System: Industrial CAD/CAM Dark Theme
+   ═══════════════════════════════════════════════════════════════════ */
+
+.auth-viewport-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 50% 25%, rgba(230, 126, 34, 0.07) 0%, transparent 60%),
+    linear-gradient(rgba(45, 51, 59, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 51, 59, 0.25) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 490px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.auth-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg-workspace);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-logo-mark {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-orange);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.auth-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.auth-build-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent-orange);
+  border: 1px solid var(--accent-orange-dim);
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: var(--accent-orange-subtle);
+  letter-spacing: 0.5px;
+}
+
+.auth-card-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-welcome-block {
+  text-align: left;
+}
+
+.auth-headline {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.auth-subhead {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── Demo Identity Container ─────────────────────────────────────── */
+.demo-identity-box {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.demo-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid var(--status-healthy-border);
+  color: var(--status-healthy);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.demo-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-avatar {
+  width: 44px;
+  height: 44px;
+  background: var(--bg-panel-elevated);
+  border: 1px solid var(--accent-orange);
+  color: var(--accent-orange);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(230, 126, 34, 0.15);
+  flex-shrink: 0;
+}
+
+.demo-profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.demo-profile-name-display {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.demo-profile-role-display {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── Name Customization Field ────────────────────────────────────── */
+.demo-name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.demo-field-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.demo-field-helper {
+  color: var(--text-muted);
+  font-size: 9px;
+  text-transform: none;
+}
+
+.demo-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.demo-name-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 9px 12px;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.demo-name-input:focus {
+  border-color: var(--accent-orange);
+  background: #15191d;
+  box-shadow: 0 0 0 1px var(--accent-orange-dim);
+}
+
+/* Preset Quick-Picks */
+.demo-preset-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.demo-preset-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.demo-preset-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.demo-preset-btn.active {
+  background: rgba(230, 126, 34, 0.12);
+  color: var(--accent-orange);
+  border-color: var(--accent-orange-dim);
+  font-weight: 600;
+}
+
+/* ── Primary Action: Enter Workspace ─────────────────────────────── */
+.enter-workspace-btn {
+  background: linear-gradient(135deg, var(--accent-orange), #f39c12);
+  border: 1px solid #f39c12;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 14px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 18px rgba(230, 126, 34, 0.35);
+  margin-top: 2px;
+}
+
+.enter-workspace-btn:hover {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  box-shadow: 0 6px 24px rgba(230, 126, 34, 0.5);
+  transform: translateY(-1px);
+}
+
+.enter-workspace-subtext {
+  font-size: 9.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.2px;
+}
+
+/* ── Informational Architecture Box ─────────────────────────────── */
+.demo-feature-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.demo-feature-item {
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.demo-feature-icon {
+  color: var(--accent-orange);
+  font-size: 11px;
+}
+
+/* Transparency Notice */
+.demo-notice-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-size: 9.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  font-family: var(--font-mono);
+}
+
+/* Footer */
+.auth-footer {
+  padding: 12px 18px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+}

@@ -1,0 +1,653 @@
+/* ═══════════════════════════════════════════════════════════════════
+   KEYSTONE AI FACTORY PLANNER — CHAT INTERFACE
+   Industrial CAD/CAM Dark Theme Stylesheet
+   ═══════════════════════════════════════════════════════════════════ */
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+/* ── Top Header ──────────────────────────────────────────────────── */
+.chat-header {
+  height: 48px;
+  background: var(--bg-workspace);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-logo-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-logo-mark {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-orange);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.chat-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-primary);
+}
+
+.chat-badge-copilot {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  background: rgba(52, 152, 219, 0.12);
+  color: var(--status-backup);
+  border: 1px solid var(--status-backup-border);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+
+.chat-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  background: var(--bg-deep);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--border-default);
+}
+
+.chat-user-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-healthy);
+}
+
+.chat-header-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.chat-header-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.chat-header-btn.primary {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: #fff;
+  font-weight: 600;
+}
+
+.chat-header-btn.primary:hover {
+  background: var(--accent-orange-hover);
+}
+
+/* ── Conversation Stream ─────────────────────────────────────────── */
+.chat-stream-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Message Item */
+.chat-msg {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.chat-msg.user {
+  flex-direction: row-reverse;
+}
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chat-msg.assistant .chat-avatar {
+  background: var(--bg-panel-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--accent-orange);
+}
+
+.chat-msg.user .chat-avatar {
+  background: var(--accent-orange-dim);
+  border: 1px solid var(--accent-orange);
+  color: #fff;
+}
+
+.chat-bubble-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 82%;
+}
+
+.chat-msg.user .chat-bubble-container {
+  align-items: flex-end;
+}
+
+.chat-sender-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-bubble {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chat-msg.user .chat-bubble {
+  background: #1b2530;
+  border-color: #2b3b4d;
+  color: #fff;
+  border-top-right-radius: 1px;
+}
+
+.chat-msg.assistant .chat-bubble {
+  border-top-left-radius: 1px;
+}
+
+/* Rich structured content inside assistant bubbles */
+.chat-bubble p {
+  margin-bottom: 10px;
+}
+
+.chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-bubble strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Suggestion Chips */
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chat-chip-btn {
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-chip-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-orange);
+}
+
+/* Machine Catalogue Card Inside Chat */
+.catalogue-station-section {
+  margin-top: 14px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.catalogue-station-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.catalogue-station-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.catalogue-station-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent-orange);
+}
+
+.catalogue-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .catalogue-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.machine-option-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.machine-option-card:hover {
+  border-color: var(--border-highlight);
+  background: var(--bg-panel-elevated);
+}
+
+.machine-option-card.selected {
+  border-color: var(--accent-orange);
+  background: rgba(230, 126, 34, 0.05);
+  box-shadow: 0 0 0 1px var(--accent-orange);
+}
+
+.machine-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.machine-card-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.machine-card-badge {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  padding: 1px 5px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.machine-card-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.machine-price-inr {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--status-healthy);
+}
+
+.machine-price-type {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.machine-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--bg-deep);
+  padding: 6px 8px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.machine-spec-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+}
+
+.machine-spec-key {
+  color: var(--text-muted);
+}
+
+.machine-spec-val {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.machine-card-notes {
+  font-size: 9px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.machine-select-btn {
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.machine-option-card.selected .machine-select-btn {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: #fff;
+}
+
+/* Plan Executive Summary Box */
+.plan-summary-box {
+  margin-top: 12px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 10px;
+}
+
+.plan-summary-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.plan-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.plan-summary-stat {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 10px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.plan-stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.plan-stat-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.plan-equipment-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plan-station-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.plan-disclaimer-alert {
+  padding: 8px 12px;
+  background: rgba(241, 196, 15, 0.05);
+  border: 1px solid rgba(241, 196, 15, 0.2);
+  border-radius: 3px;
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  line-height: 1.45;
+}
+
+.plan-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.simulate-factory-cta {
+  background: linear-gradient(135deg, var(--accent-orange), #f39c12);
+  border: 1px solid #f39c12;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 14px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 18px rgba(230, 126, 34, 0.35);
+  transition: all 0.2s ease;
+}
+
+.simulate-factory-cta:hover {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  box-shadow: 0 6px 24px rgba(230, 126, 34, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Typing Indicator Animation */
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.typing-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingPulse 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Bottom Input Area ───────────────────────────────────────────── */
+.chat-input-bar {
+  background: var(--bg-workspace);
+  border-top: 1px solid var(--border-default);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.chat-text-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.chat-text-input:focus {
+  border-color: var(--accent-orange);
+  background: #15191d;
+}
+
+.chat-send-btn {
+  background: var(--accent-orange);
+  border: 1px solid var(--accent-orange);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: var(--accent-orange-hover);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input-helper {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  text-align: center;
+}
